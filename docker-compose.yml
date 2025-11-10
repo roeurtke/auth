@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  auth:
+    build:
+      context: .devcontainer
+      dockerfile: Dockerfile
+    container_name: auth-service
+    volumes:
+      - .:/workspace/auth
+      - maven-data:/root/.m2
+    working_dir: /workspace
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_R2DBC_URL: r2dbc:postgresql://host.docker.internal:5432/authdb
+      SPRING_R2DBC_USERNAME: postgres
+      SPRING_R2DBC_PASSWORD: 111111
+      SERVER_PORT: 8080
+    ports:
+      - "8080:8080"
+          
+volumes:
+  maven-data:
