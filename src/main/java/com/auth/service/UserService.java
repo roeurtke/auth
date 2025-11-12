@@ -3,6 +3,8 @@ package com.auth.service;
 import com.auth.dto.UserDto;
 import com.auth.model.User;
 import com.auth.repository.UserRepository;
+import com.auth.repository.UserRoleRepository;
+import com.auth.repository.RoleRepository;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,16 +17,38 @@ import reactor.core.publisher.Mono;
 public class UserService implements ReactiveUserDetailsService {
     
     private final UserRepository userRepository;
+    private final UserRoleRepository userRoleRepository;
+    private final RoleRepository roleRepository;
     
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, UserRoleRepository userRoleRepository, RoleRepository roleRepository) {
         this.userRepository = userRepository;
+        this.userRoleRepository = userRoleRepository;
+        this.roleRepository = roleRepository;
     }
     
     @Override
     public Mono<UserDetails> findByUsername(String username) {
-        return userRepository.findByUsernameWithRoles(username)
+        return userRepository.findByUsername(username)
+                .switchIfEmpty(Mono.error(new UsernameNotFoundException("User not found: " + username)))
+                .flatMap(user -> loadUserRoles(user)
+                        .thenReturn(user)
                 .cast(UserDetails.class)
-                .switchIfEmpty(Mono.error(new UsernameNotFoundException("User not found: " + username)));
+                );
+    }
+    
+    private Mono<Void> loadUserRoles(User user) {
+    return userRoleRepository.findByUserId(user.getId())
+        .collectList()
+        .flatMap(userRoles -> {
+            if (userRoles.isEmpty()) {
+            return Mono.empty();
+            }
+            return Flux.fromIterable(userRoles)
+                .flatMap(userRole -> roleRepository.findById(userRole.getRoleId()))
+                .collectList()
+                .doOnNext(roles -> user.setRoles(roles.stream().collect(java.util.stream.Collectors.toSet())))
+                .then();
+        });
     }
     
     public Mono<User> findById(Long id) {

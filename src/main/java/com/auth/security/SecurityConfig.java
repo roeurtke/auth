@@ -19,6 +19,7 @@ import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import reactor.core.publisher.Mono;
 
 @Configuration
 @EnableWebFluxSecurity
@@ -29,7 +30,7 @@ public class SecurityConfig {
     private final ReactiveUserDetailsService userDetailsService;
     
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, 
-                         ReactiveUserDetailsService userDetailsService) {
+                        ReactiveUserDetailsService userDetailsService) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.userDetailsService = userDetailsService;
     }
@@ -49,9 +50,13 @@ public class SecurityConfig {
     
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
-        // Create AuthenticationWebFilter and set the converter
-        AuthenticationWebFilter authenticationWebFilter = new AuthenticationWebFilter(authenticationManager());
-        authenticationWebFilter.setServerAuthenticationConverter(jwtAuthenticationFilter);
+    // Create AuthenticationWebFilter and set the converter
+    // Use a no-op ReactiveAuthenticationManager for JWTs since the filter builds a fully
+    // populated Authentication (principal + authorities). We don't need password-based
+    // authentication here.
+    ReactiveAuthenticationManager jwtAuthManager = authentication -> Mono.just(authentication);
+    AuthenticationWebFilter authenticationWebFilter = new AuthenticationWebFilter(jwtAuthManager);
+    authenticationWebFilter.setServerAuthenticationConverter(jwtAuthenticationFilter);
         
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
