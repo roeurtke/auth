@@ -13,6 +13,10 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * @author Roeurt Kesei
+ * User entity representing a user in the authentication system.
+ */
 @Table("tbl_user")
 public class User implements UserDetails, CredentialsContainer {
     
