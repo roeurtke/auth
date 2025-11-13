@@ -5,6 +5,10 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+/**
+ * @author Roeurt Kesei
+ * DTO for user registration requests.
+ */
 @Schema(description = "User registration request")
 public class RegisterRequest {
     
