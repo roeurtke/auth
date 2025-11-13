@@ -3,6 +3,10 @@ package com.auth.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 
+/**
+ * @author Roeurt Kesei
+ * RefreshTokenRequest DTO for refresh token requests.
+ */
 @Schema(description = "Refresh token request")
 public class RefreshTokenRequest {
     
