@@ -2,6 +2,10 @@ package com.auth.model;
 
 import org.springframework.data.relational.core.mapping.Table;
 
+/**
+ * @author Roeurt Kesei
+ * RolePermission entity representing the association between roles and permissions.
+ */
 @Table("tbl_role_permission")
 public class RolePermission {
     
