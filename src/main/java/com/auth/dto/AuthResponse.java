@@ -9,6 +9,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "Authentication response")
 public class AuthResponse {
     
+    @Schema(description = "Authentication message", example = "Success")
+    private String message;
+
     @Schema(description = "Access token", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
     private String accessToken;
     
@@ -27,7 +30,12 @@ public class AuthResponse {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.expiresIn = expiresIn;
+        // this.message = (accessToken != null && !accessToken.isBlank()) ? "Success" : null;
+        this.message = "Success";
     }
+
+    public String getMessage() { return message; }
+    public void setMessage(String message) { this.message = message; }
 
     public String getAccessToken() { return accessToken; }
     public void setAccessToken(String accessToken) { this.accessToken = accessToken; }
