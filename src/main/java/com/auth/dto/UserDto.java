@@ -7,6 +7,10 @@ import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * @author Roeurt Kesei
+ * DTO for user responses.
+ */
 @Schema(description = "User data transfer object")
 public class UserDto {
     
