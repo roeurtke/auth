@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+/**
+ * @author Roeurt Kesei
+ * Role management REST controller.
+ */
 @RestController
 @RequestMapping("/api/roles")
 @Tag(name = "Roles", description = "Role management endpoints")
