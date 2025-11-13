@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+/**
+ * @author Roeurt Kesei
+ * User management REST controller.
+ */
 @RestController
 @RequestMapping("/api/users")
 @Tag(name = "Users", description = "User management endpoints")
