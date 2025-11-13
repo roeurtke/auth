@@ -3,6 +3,10 @@ package com.auth.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
+/**
+ * @author Roeurt Kesei
+ * Permission entity representing a permission in the authentication system.
+ */
 @Table("tbl_permission")
 public class Permission {
     
