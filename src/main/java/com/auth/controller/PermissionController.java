@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+/**
+ * @author Roeurt Kesei
+ * Permission management REST controller.
+ */
 @RestController
 @RequestMapping("/api/permissions")
 @Tag(name = "Permissions", description = "Permission management endpoints")
