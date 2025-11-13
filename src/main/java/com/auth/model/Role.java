@@ -7,6 +7,10 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * @author Roeurt Kesei
+ * Role entity representing a role in the authentication system.
+ */
 @Table("tbl_role")
 public class Role {
     
