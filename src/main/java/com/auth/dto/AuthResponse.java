@@ -2,6 +2,10 @@ package com.auth.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+/**
+ * @author Roeurt Kesei
+ * DTO for authentication responses containing access and refresh tokens.
+ */
 @Schema(description = "Authentication response")
 public class AuthResponse {
     
