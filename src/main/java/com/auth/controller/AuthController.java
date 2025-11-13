@@ -15,6 +15,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+/**
+ * @author Roeurt Kesei
+ * Controller for handling authentication-related endpoints such as registration,
+ * login, and token refresh.
+ */
 @RestController
 @RequestMapping("/api/auth")
 @Tag(name = "Authentication", description = "Authentication endpoints")
