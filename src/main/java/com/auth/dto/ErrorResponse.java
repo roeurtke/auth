@@ -4,6 +4,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
 
+/**
+ * @author Roeurt Kesei
+ * Holds error response DTO structure.
+ */
 @Schema(description = "Error response structure")
 public class ErrorResponse {
     
