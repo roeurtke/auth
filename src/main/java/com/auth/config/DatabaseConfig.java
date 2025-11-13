@@ -8,6 +8,10 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.r2dbc.connection.init.ConnectionFactoryInitializer;
 import org.springframework.r2dbc.connection.init.ResourceDatabasePopulator;
 
+/**
+ * @author Roeurt Kesei
+ * Database configuration class to initialize the database schema and seed data
+ */
 @Configuration
 public class DatabaseConfig {
 
