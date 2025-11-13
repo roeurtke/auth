@@ -13,6 +13,10 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author Roeurt Kesei
+ * Global exception handler to manage and format error responses consistently
+ */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
