@@ -5,6 +5,10 @@ import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Mono;
 
+/**
+ * @author Roeurt Kesei
+ * Repository for managing User entities.
+ */
 public interface UserRepository extends ReactiveCrudRepository<User, Long> {
     
     Mono<User> findByUsername(String username);
