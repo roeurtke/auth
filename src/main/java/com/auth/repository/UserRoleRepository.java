@@ -6,6 +6,10 @@ import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+/**
+ * @author Roeurt Kesei
+ * Repository for managing UserRole entities.
+ */
 public interface UserRoleRepository extends ReactiveCrudRepository<UserRole, Long> {
     
     Flux<UserRole> findByUserId(Long userId);
