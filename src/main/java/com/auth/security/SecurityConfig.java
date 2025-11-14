@@ -21,6 +21,10 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import reactor.core.publisher.Mono;
 
+/**
+ * @author Roeurt Kesei
+ * Security configuration for the application.
+ */
 @Configuration
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
