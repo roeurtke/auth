@@ -4,6 +4,10 @@ import com.auth.model.Permission;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Mono;
 
+/**
+ * @author Roeurt Kesei
+ * Repository for managing Permission entities.
+ */
 public interface PermissionRepository extends ReactiveCrudRepository<Permission, Long> {
     
     Mono<Permission> findByName(String name);
