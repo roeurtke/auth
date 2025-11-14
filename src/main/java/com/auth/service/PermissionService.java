@@ -7,6 +7,10 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+/**
+ * @author Roeurt Kesei
+ * Service for managing permissions.
+ */
 @Service
 public class PermissionService {
     
