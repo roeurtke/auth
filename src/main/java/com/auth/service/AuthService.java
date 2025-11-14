@@ -13,6 +13,10 @@ import reactor.core.publisher.Mono;
 
 import java.util.HashSet;
 
+/**
+ * @author Roeurt Kesei
+ * Service for handling user authentication and registration.
+ */
 @Service
 public class AuthService {
     
