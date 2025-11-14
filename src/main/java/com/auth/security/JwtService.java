@@ -18,6 +18,10 @@ import java.util.stream.Collectors;
 
 import java.time.Duration;
 
+/**
+ * @author Roeurt Kesei
+ * Service for generating and validating JWT tokens.
+ */
 @Service
 public class JwtService {
     
