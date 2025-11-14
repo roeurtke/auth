@@ -4,6 +4,10 @@ import com.auth.model.Role;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Mono;
 
+/**
+ * @author Roeurt Kesei
+ * Repository for managing Role entities.
+ */
 public interface RoleRepository extends ReactiveCrudRepository<Role, Long> {
     
     Mono<Role> findByName(String name);
