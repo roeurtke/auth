@@ -13,6 +13,10 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+/**
+ * @author Roeurt Kesei
+ * Service for managing users.
+ */
 @Service
 public class UserService implements ReactiveUserDetailsService {
     
