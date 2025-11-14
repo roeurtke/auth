@@ -8,6 +8,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+/**
+ * @author Roeurt Kesei
+ * JWT Authentication Filter for extracting and validating JWT tokens from HTTP requests.
+ */
 @Component
 public class JwtAuthenticationFilter implements ServerAuthenticationConverter {
     
