@@ -1,5 +1,6 @@
 package com.auth.controller;
 
+import com.auth.dto.UserCreateRequest;
 import com.auth.dto.UserDto;
 import com.auth.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,6 +26,13 @@ public class UserController {
         this.userService = userService;
     }
     
+    @PostMapping
+    @Operation(summary = "Create new user",
+            description = "Create a new user (requires USER_WRITE permission and ADMIN role)")
+    public Mono<UserDto> createUser(@RequestBody UserCreateRequest request) {
+        return userService.createUser(request);
+    }
+    
     @GetMapping
     @Operation(summary = "Get all users", 
         description = "Retrieve all users (requires USER_READ permission or ADMIN role)")
@@ -38,7 +46,7 @@ public class UserController {
     public Mono<UserDto> getUserById(@PathVariable Long id) {
         return userService.findUserById(id);
     }
-    
+
     @PutMapping("/{id}")
     @Operation(summary = "Update user", 
         description = "Update user information (requires USER_WRITE permission and ADMIN role)")

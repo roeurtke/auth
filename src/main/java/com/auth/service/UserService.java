@@ -1,5 +1,6 @@
 package com.auth.service;
 
+import com.auth.dto.UserCreateRequest;
 import com.auth.dto.UserDto;
 import com.auth.model.User;
 import com.auth.repository.UserRepository;
@@ -72,7 +73,55 @@ public class UserService implements ReactiveUserDetailsService {
                 .flatMap(user -> loadUserRoles(user).thenReturn(user))
                 .flatMap(this::mapUserToDto);
     }
-    
+
+    @PreAuthorize("hasAuthority('USER_WRITE') or hasRole('ADMIN')")
+    public Mono<UserDto> createUser(UserCreateRequest request) {
+
+        return existsByUsername(request.getUsername())
+                .flatMap(exists -> {
+                    if (exists) {
+                        return Mono.error(new RuntimeException("Username already exists"));
+                    }
+                    return existsByEmail(request.getEmail());
+                })
+                .flatMap(existsEmail -> {
+                    if (existsEmail) {
+                        return Mono.error(new RuntimeException("Email already exists"));
+                    }
+
+                    User user = new User();
+                    user.setFirstName(request.getFirstName());
+                    user.setLastName(request.getLastName());
+                    user.setUsername(request.getUsername());
+                    user.setPassword(request.getPassword());
+                    user.setEmail(request.getEmail());
+                    user.setPhoneNumber(request.getPhoneNumber());
+                    user.setEnabled(true);
+                    user.setCreatedAt(java.time.LocalDateTime.now());
+                    user.setUpdatedAt(java.time.LocalDateTime.now());
+
+                    return userRepository.save(user);
+                })
+                .flatMap(savedUser -> {
+
+                    if (request.getRoles() == null || request.getRoles().isEmpty()) {
+                        return Mono.just(savedUser);
+                    }
+
+                    return Flux.fromIterable(request.getRoles())
+                            .flatMap(roleRepository::findByName)
+                            .flatMap(role ->
+                                    userRoleRepository.save(new com.auth.model.UserRole(
+                                            savedUser.getId(),
+                                            role.getId()
+                                    ))
+                            )
+                            .then(Mono.just(savedUser));
+                })
+                .flatMap(user -> loadUserRoles(user).thenReturn(user))
+                .flatMap(this::mapUserToDto);
+    }
+
     @PreAuthorize("hasAuthority('USER_WRITE') and hasRole('ADMIN')")
     public Mono<UserDto> updateUser(Long id, UserDto userDto) {
         return userRepository.findById(id)
