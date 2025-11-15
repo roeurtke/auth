@@ -28,7 +28,8 @@ public class User implements UserDetails, CredentialsContainer {
     private String password;
     private String phoneNumber;
     private String email;
-    private Boolean enabled = true;
+    private Integer status = UserStatus.ACTIVE.getValue();
+    private Boolean isDeleted = false;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     
@@ -47,6 +48,8 @@ public class User implements UserDetails, CredentialsContainer {
         this.username = username;
         this.password = password;
         this.email = email;
+        this.status = UserStatus.ACTIVE.getValue();
+        this.isDeleted = false;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
@@ -75,8 +78,11 @@ public class User implements UserDetails, CredentialsContainer {
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
     
-    public Boolean getEnabled() { return enabled; }
-    public void setEnabled(Boolean enabled) { this.enabled = enabled; }
+    public Integer getStatus() { return status; }
+    public void setStatus(Integer status) { this.status = status; }
+    
+    public Boolean getIsDeleted() { return isDeleted; }
+    public void setIsDeleted(Boolean isDeleted) { this.isDeleted = isDeleted; }
     
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
@@ -116,7 +122,7 @@ public class User implements UserDetails, CredentialsContainer {
     public boolean isCredentialsNonExpired() { return true; }
 
     @Override
-    public boolean isEnabled() { return enabled; }
+    public boolean isEnabled() { return status.equals(UserStatus.ACTIVE.getValue()) && !isDeleted; }
 
     @Override
     public void eraseCredentials() {

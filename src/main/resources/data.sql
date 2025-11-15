@@ -32,8 +32,8 @@ WHERE r.name = 'USER' AND p.name IN ('USER_READ')
 ON CONFLICT DO NOTHING;
 
 -- Create default admin user (password: admin123)
-INSERT INTO tbl_user (first_name, last_name, username, password, email, enabled) VALUES 
-('System', 'Administrator', 'admin', '$2a$12$v3ZTNqnTf.DW6iI0P1fD1eW3rliM9yXSDczQ7oKFWxfoNXjtI.XtS', 'admin@example.com', true)
+INSERT INTO tbl_user (first_name, last_name, username, password, email, status, is_deleted) VALUES 
+('System', 'Administrator', 'admin', '$2a$12$v3ZTNqnTf.DW6iI0P1fD1eW3rliM9yXSDczQ7oKFWxfoNXjtI.XtS', 'admin@example.com', 1, false)
 ON CONFLICT (username) DO UPDATE SET password = EXCLUDED.password;
 
 -- Assign ADMIN role to admin user

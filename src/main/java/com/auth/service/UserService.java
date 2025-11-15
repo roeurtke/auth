@@ -96,7 +96,8 @@ public class UserService implements ReactiveUserDetailsService {
                     user.setPassword(request.getPassword());
                     user.setEmail(request.getEmail());
                     user.setPhoneNumber(request.getPhoneNumber());
-                    user.setEnabled(true);
+                    user.setStatus(com.auth.model.UserStatus.ACTIVE.getValue());
+                    user.setIsDeleted(false);
                     user.setCreatedAt(java.time.LocalDateTime.now());
                     user.setUpdatedAt(java.time.LocalDateTime.now());
 
@@ -130,7 +131,12 @@ public class UserService implements ReactiveUserDetailsService {
                     user.setLastName(userDto.getLastName());
                     user.setEmail(userDto.getEmail());
                     user.setPhoneNumber(userDto.getPhoneNumber());
-                    user.setEnabled(userDto.getEnabled());
+                    if (userDto.getStatus() != null) {
+                        user.setStatus(userDto.getStatus());
+                    }
+                    if (userDto.getIsDeleted() != null) {
+                        user.setIsDeleted(userDto.getIsDeleted());
+                    }
                     return userRepository.save(user);
                 })
                 .flatMap(this::mapUserToDto);
@@ -161,7 +167,8 @@ public class UserService implements ReactiveUserDetailsService {
         dto.setUsername(user.getUsername());
         dto.setEmail(user.getEmail());
         dto.setPhoneNumber(user.getPhoneNumber());
-        dto.setEnabled(user.getEnabled());
+        dto.setStatus(user.getStatus());
+        dto.setIsDeleted(user.getIsDeleted());
         dto.setCreatedAt(user.getCreatedAt());
         dto.setUpdatedAt(user.getUpdatedAt());
         dto.setRolesFromEntities(user.getRoles());

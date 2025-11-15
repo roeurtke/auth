@@ -32,8 +32,11 @@ public class UserDto {
     @Schema(description = "Phone number", example = "+1234567890")
     private String phoneNumber;
     
-    @Schema(description = "Whether user is enabled", example = "true")
-    private Boolean enabled;
+    @Schema(description = "User status (1=ACTIVE, 2=INACTIVE, 3=DELETED)", example = "1")
+    private Integer status;
+    
+    @Schema(description = "Whether user is deleted", example = "false")
+    private Boolean isDeleted;
     
     @Schema(description = "User roles")
     private Set<String> roles;
@@ -65,8 +68,11 @@ public class UserDto {
     public String getPhoneNumber() { return phoneNumber; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
     
-    public Boolean getEnabled() { return enabled; }
-    public void setEnabled(Boolean enabled) { this.enabled = enabled; }
+    public Integer getStatus() { return status; }
+    public void setStatus(Integer status) { this.status = status; }
+    
+    public Boolean getIsDeleted() { return isDeleted; }
+    public void setIsDeleted(Boolean isDeleted) { this.isDeleted = isDeleted; }
     
     public Set<String> getRoles() { return roles; }
     public void setRoles(Set<String> roles) { this.roles = roles; }

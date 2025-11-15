@@ -9,6 +9,8 @@ public class UserCreateRequest {
     private String password;
     private String email;
     private String phoneNumber;
+    private Integer status;
+    private Boolean isDeleted;
     private Set<String> roles;
     public String getFirstName() {
         return firstName;
@@ -45,6 +47,18 @@ public class UserCreateRequest {
     }
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+    public Integer getStatus() {
+        return status;
+    }
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+    public Boolean getIsDeleted() {
+        return isDeleted;
+    }
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
     public Set<String> getRoles() {
         return roles;
