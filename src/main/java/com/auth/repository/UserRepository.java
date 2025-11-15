@@ -3,6 +3,7 @@ package com.auth.repository;
 import com.auth.model.User;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -15,6 +16,15 @@ public interface UserRepository extends ReactiveCrudRepository<User, Long> {
     
     Mono<User> findByEmail(String email);
     
+    // Find only non-deleted users
+    Mono<User> findByUsernameAndIsDeletedFalse(String username);
+
+    Mono<User> findByEmailAndIsDeletedFalse(String email);
+
+    Flux<User> findAllByIsDeletedFalse();
+
+    Mono<User> findByIdAndIsDeletedFalse(Long id);
+    
     Mono<Boolean> existsByUsername(String username);
     
     Mono<Boolean> existsByEmail(String email);
@@ -23,6 +33,6 @@ public interface UserRepository extends ReactiveCrudRepository<User, Long> {
         "FROM tbl_user u " +
         "LEFT JOIN tbl_user_role ur ON u.id = ur.user_id " +
         "LEFT JOIN tbl_role r ON ur.role_id = r.id " +
-        "WHERE u.username = :username")
+        "WHERE u.username = :username AND u.is_deleted = false")
     Mono<User> findByUsernameWithRoles(String username);
 }

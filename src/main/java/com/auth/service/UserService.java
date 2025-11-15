@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import java.time.LocalDateTime;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -31,15 +32,15 @@ public class UserService implements ReactiveUserDetailsService {
         this.roleRepository = roleRepository;
     }
     
-    @Override
-    public Mono<UserDetails> findByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .switchIfEmpty(Mono.error(new UsernameNotFoundException("User not found: " + username)))
-                .flatMap(user -> loadUserRoles(user)
-                        .thenReturn(user)
+        @Override
+        public Mono<UserDetails> findByUsername(String username) {
+        return userRepository.findByUsernameAndIsDeletedFalse(username)
+            .switchIfEmpty(Mono.error(new UsernameNotFoundException("User not found: " + username)))
+            .flatMap(user -> loadUserRoles(user)
+                .thenReturn(user)
                 .cast(UserDetails.class)
-                );
-    }
+            );
+        }
     
     private Mono<Void> loadUserRoles(User user) {
     return userRoleRepository.findByUserId(user.getId())
@@ -57,19 +58,19 @@ public class UserService implements ReactiveUserDetailsService {
     }
     
     public Mono<User> findById(Long id) {
-        return userRepository.findById(id);
+        return userRepository.findByIdAndIsDeletedFalse(id);
     }
     
     @PreAuthorize("hasAuthority('USER_READ') or hasRole('ADMIN')")
     public Flux<UserDto> findAllUsers() {
-        return userRepository.findAll()
+        return userRepository.findAllByIsDeletedFalse()
                 .flatMap(user -> loadUserRoles(user).thenReturn(user))
                 .flatMap(this::mapUserToDto);
     }
     
     @PreAuthorize("hasAuthority('USER_READ') or hasRole('ADMIN')")
     public Mono<UserDto> findUserById(Long id) {
-        return userRepository.findById(id)
+        return userRepository.findByIdAndIsDeletedFalse(id)
                 .flatMap(user -> loadUserRoles(user).thenReturn(user))
                 .flatMap(this::mapUserToDto);
     }
@@ -125,7 +126,7 @@ public class UserService implements ReactiveUserDetailsService {
 
     @PreAuthorize("hasAuthority('USER_WRITE') and hasRole('ADMIN')")
     public Mono<UserDto> updateUser(Long id, UserDto userDto) {
-        return userRepository.findById(id)
+        return userRepository.findByIdAndIsDeletedFalse(id)
                 .flatMap(user -> {
                     user.setFirstName(userDto.getFirstName());
                     user.setLastName(userDto.getLastName());
@@ -144,7 +145,14 @@ public class UserService implements ReactiveUserDetailsService {
     
     @PreAuthorize("hasAuthority('USER_DELETE') and hasRole('ADMIN')")
     public Mono<Void> deleteUser(Long id) {
-        return userRepository.deleteById(id);
+        return userRepository.findByIdAndIsDeletedFalse(id)
+                .flatMap(user -> {
+                    user.setIsDeleted(true);
+                    user.setStatus(com.auth.model.UserStatus.DELETED.getValue());
+                    user.setUpdatedAt(LocalDateTime.now());
+                    return userRepository.save(user);
+                })
+                .then();
     }
     
     public Mono<Boolean> existsByUsername(String username) {
