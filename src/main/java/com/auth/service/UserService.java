@@ -62,12 +62,14 @@ public class UserService implements ReactiveUserDetailsService {
     @PreAuthorize("hasAuthority('USER_READ') or hasRole('ADMIN')")
     public Flux<UserDto> findAllUsers() {
         return userRepository.findAll()
+                .flatMap(user -> loadUserRoles(user).thenReturn(user))
                 .flatMap(this::mapUserToDto);
     }
     
     @PreAuthorize("hasAuthority('USER_READ') or hasRole('ADMIN')")
     public Mono<UserDto> findUserById(Long id) {
         return userRepository.findById(id)
+                .flatMap(user -> loadUserRoles(user).thenReturn(user))
                 .flatMap(this::mapUserToDto);
     }
     
