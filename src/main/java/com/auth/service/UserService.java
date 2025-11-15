@@ -6,6 +6,8 @@ import com.auth.model.User;
 import com.auth.repository.UserRepository;
 import com.auth.repository.UserRoleRepository;
 import com.auth.repository.RoleRepository;
+import com.auth.repository.RolePermissionRepository;
+import com.auth.repository.PermissionRepository;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,11 +27,16 @@ public class UserService implements ReactiveUserDetailsService {
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
     private final RoleRepository roleRepository;
+    private final RolePermissionRepository rolePermissionRepository;
+    private final PermissionRepository permissionRepository;
     
-    public UserService(UserRepository userRepository, UserRoleRepository userRoleRepository, RoleRepository roleRepository) {
+    public UserService(UserRepository userRepository, UserRoleRepository userRoleRepository, RoleRepository roleRepository,
+                    RolePermissionRepository rolePermissionRepository, PermissionRepository permissionRepository) {
         this.userRepository = userRepository;
         this.userRoleRepository = userRoleRepository;
         this.roleRepository = roleRepository;
+        this.rolePermissionRepository = rolePermissionRepository;
+        this.permissionRepository = permissionRepository;
     }
     
         @Override
@@ -43,18 +50,28 @@ public class UserService implements ReactiveUserDetailsService {
         }
     
     private Mono<Void> loadUserRoles(User user) {
-    return userRoleRepository.findByUserId(user.getId())
-        .collectList()
-        .flatMap(userRoles -> {
-            if (userRoles.isEmpty()) {
-            return Mono.empty();
-            }
-            return Flux.fromIterable(userRoles)
-                .flatMap(userRole -> roleRepository.findById(userRole.getRoleId()))
-                .collectList()
-                .doOnNext(roles -> user.setRoles(roles.stream().collect(java.util.stream.Collectors.toSet())))
-                .then();
-        });
+        return userRoleRepository.findByUserId(user.getId())
+            .collectList()
+            .flatMap(userRoles -> {
+                if (userRoles.isEmpty()) {
+                    return Mono.empty();
+                }
+                return Flux.fromIterable(userRoles)
+                    .flatMap(userRole -> roleRepository.findById(userRole.getRoleId()))
+                    .collectList()
+                    .doOnNext(roles -> user.setRoles(roles.stream().collect(java.util.stream.Collectors.toSet())))
+                    .flatMap(roles -> loadPermissionsForRoles(user, roles))
+                    .then();
+            });
+    }
+    
+    private Mono<Void> loadPermissionsForRoles(User user, java.util.List<com.auth.model.Role> roles) {
+        return Flux.fromIterable(roles)
+            .flatMap(role -> rolePermissionRepository.findByRoleId(role.getId()))
+            .flatMap(rolePermission -> permissionRepository.findById(rolePermission.getPermissionId()))
+            .collectList()
+            .doOnNext(permissions -> user.setPermissions(permissions.stream().collect(java.util.stream.Collectors.toSet())))
+            .then();
     }
     
     public Mono<User> findById(Long id) {
