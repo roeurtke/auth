@@ -52,14 +52,16 @@ public class UserController {
     @PutMapping("/{id}")
     @Operation(summary = "Update user", 
         description = "Update user information (requires USER_WRITE permission and ADMIN role)")
-    public Mono<UserDto> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
-        return userService.updateUser(id, userDto);
+    public Mono<ApiResponse<UserDto>> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
+        return userService.updateUser(id, userDto)
+                .map(dto -> new ApiResponse<>("User is updated successfully.", dto));
     }
     
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete user", 
         description = "Delete user (requires USER_DELETE permission and ADMIN role)")
-    public Mono<Void> deleteUser(@PathVariable Long id) {
-        return userService.deleteUser(id);
+    public Mono<ApiResponse<Void>> deleteUser(@PathVariable Long id) {
+        return userService.deleteUser(id)
+                .thenReturn(new ApiResponse<Void>("User is deleted successfully.", null));
     }
 }

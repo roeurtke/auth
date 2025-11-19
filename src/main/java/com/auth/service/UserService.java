@@ -150,7 +150,11 @@ public class UserService implements ReactiveUserDetailsService {
                     user.setEmail(userDto.getEmail());
                     user.setPhoneNumber(userDto.getPhoneNumber());
                     if (userDto.getStatus() != null) {
-                        user.setStatus(userDto.getStatus());
+                        try {
+                            user.setStatus(com.auth.model.UserStatus.valueOf(userDto.getStatus()).getValue());
+                        } catch (IllegalArgumentException e) {
+                            return Mono.error(new RuntimeException("Invalid status value: " + userDto.getStatus()));
+                        }
                     }
                     if (userDto.getIsDeleted() != null) {
                         user.setIsDeleted(userDto.getIsDeleted());
@@ -192,7 +196,7 @@ public class UserService implements ReactiveUserDetailsService {
         dto.setUsername(user.getUsername());
         dto.setEmail(user.getEmail());
         dto.setPhoneNumber(user.getPhoneNumber());
-        dto.setStatus(user.getStatus());
+        dto.setStatusFromValue(user.getStatus());
         dto.setIsDeleted(user.getIsDeleted());
         dto.setCreatedAt(user.getCreatedAt());
         dto.setUpdatedAt(user.getUpdatedAt());

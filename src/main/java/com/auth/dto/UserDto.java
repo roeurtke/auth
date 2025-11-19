@@ -1,6 +1,7 @@
 package com.auth.dto;
 
 import com.auth.model.Role;
+import com.auth.model.UserStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
@@ -32,8 +33,8 @@ public class UserDto {
     @Schema(description = "Phone number", example = "+1234567890")
     private String phoneNumber;
     
-    @Schema(description = "User status (1=ACTIVE, 2=INACTIVE, 3=DELETED)", example = "1")
-    private Integer status;
+    @Schema(description = "User status (ACTIVE, INACTIVE, DELETED)", example = "ACTIVE")
+    private String status;
     
     @Schema(description = "Whether user is deleted", example = "false")
     private Boolean isDeleted;
@@ -68,8 +69,14 @@ public class UserDto {
     public String getPhoneNumber() { return phoneNumber; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
     
-    public Integer getStatus() { return status; }
-    public void setStatus(Integer status) { this.status = status; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+    
+    public void setStatusFromValue(Integer statusValue) {
+        if (statusValue != null) {
+            this.status = UserStatus.fromValue(statusValue).name();
+        }
+    }
     
     public Boolean getIsDeleted() { return isDeleted; }
     public void setIsDeleted(Boolean isDeleted) { this.isDeleted = isDeleted; }
