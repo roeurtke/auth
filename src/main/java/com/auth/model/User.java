@@ -49,7 +49,7 @@ public class User implements UserDetails, CredentialsContainer {
         this.username = username;
         this.password = password;
         this.email = email;
-        this.status = UserStatus.ACTIVE.getValue();
+        this.status = EnumStatus.ACTIVE.getValue();
         this.isDeleted = false;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
