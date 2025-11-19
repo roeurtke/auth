@@ -166,6 +166,10 @@ public class UserService implements ReactiveUserDetailsService {
                         com.auth.model.UserStatus statusEnum =
                                 com.auth.model.UserStatus.valueOf(userDto.getStatus().toUpperCase());
                         user.setStatus(statusEnum.getValue());
+                        // If status set to ACTIVE, ensure the user is not marked as deleted
+                        if (statusEnum == com.auth.model.UserStatus.ACTIVE) {
+                            user.setIsDeleted(false);
+                        }
                     } catch (IllegalArgumentException ex) {
                         return Mono.error(new RuntimeException(
                                 "Invalid status: " + userDto.getStatus()
