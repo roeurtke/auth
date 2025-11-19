@@ -8,6 +8,7 @@ import com.auth.repository.UserRoleRepository;
 import com.auth.repository.RoleRepository;
 import com.auth.repository.RolePermissionRepository;
 import com.auth.repository.PermissionRepository;
+import com.auth.util.EnumStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -114,7 +115,7 @@ public class UserService implements ReactiveUserDetailsService {
                     user.setPassword(request.getPassword());
                     user.setEmail(request.getEmail());
                     user.setPhoneNumber(request.getPhoneNumber());
-                    user.setStatus(com.auth.model.UserStatus.ACTIVE.getValue());
+                    user.setStatus(EnumStatus.ACTIVE.getValue());
                     user.setIsDeleted(false);
                     user.setCreatedAt(java.time.LocalDateTime.now());
                     user.setUpdatedAt(java.time.LocalDateTime.now());
@@ -163,11 +164,10 @@ public class UserService implements ReactiveUserDetailsService {
                 // Update status (enum name only)
                 if (userDto.getStatus() != null) {
                     try {
-                        com.auth.model.UserStatus statusEnum =
-                                com.auth.model.UserStatus.valueOf(userDto.getStatus().toUpperCase());
+                        EnumStatus statusEnum = EnumStatus.valueOf(userDto.getStatus().toUpperCase());
                         user.setStatus(statusEnum.getValue());
                         // If status set to ACTIVE, ensure the user is not marked as deleted
-                        if (statusEnum == com.auth.model.UserStatus.ACTIVE) {
+                        if (statusEnum == EnumStatus.ACTIVE) {
                             user.setIsDeleted(false);
                         }
                     } catch (IllegalArgumentException ex) {
@@ -214,7 +214,7 @@ public class UserService implements ReactiveUserDetailsService {
         return userRepository.findByIdAndIsDeletedFalse(id)
                 .flatMap(user -> {
                     user.setIsDeleted(true);
-                    user.setStatus(com.auth.model.UserStatus.DELETED.getValue());
+                    user.setStatus(EnumStatus.DELETED.getValue());
                     user.setUpdatedAt(LocalDateTime.now());
                     return userRepository.save(user);
                 })

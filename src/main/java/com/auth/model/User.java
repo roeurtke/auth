@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import com.auth.util.EnumStatus;
 
 /**
  * @author Roeurt Kesei
@@ -28,7 +29,7 @@ public class User implements UserDetails, CredentialsContainer {
     private String password;
     private String phoneNumber;
     private String email;
-    private Integer status = UserStatus.ACTIVE.getValue();
+    private Integer status = EnumStatus.ACTIVE.getValue();
     private Boolean isDeleted = false;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -121,8 +122,8 @@ public class User implements UserDetails, CredentialsContainer {
     @Override
     public boolean isCredentialsNonExpired() { return true; }
 
-    @Override
-    public boolean isEnabled() { return status.equals(UserStatus.ACTIVE.getValue()) && !isDeleted; }
+    // @Override
+    // public boolean isEnabled() { return status.equals(EnumStatus.ACTIVE.getValue()) && !isDeleted; }
 
     @Override
     public void eraseCredentials() {

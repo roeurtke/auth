@@ -1,7 +1,7 @@
 package com.auth.dto;
 
 import com.auth.model.Role;
-import com.auth.model.UserStatus;
+import com.auth.util.EnumStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
@@ -74,7 +74,7 @@ public class UserDto {
     
     public void setStatusFromValue(Integer statusValue) {
         if (statusValue != null) {
-            this.status = UserStatus.fromValue(statusValue).name();
+            this.status = EnumStatus.fromValue(statusValue).name();
         }
     }
     
