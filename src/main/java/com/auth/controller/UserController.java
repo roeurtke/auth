@@ -2,6 +2,7 @@ package com.auth.controller;
 
 import com.auth.dto.UserCreateRequest;
 import com.auth.dto.UserDto;
+import com.auth.dto.ApiResponse;
 import com.auth.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -29,8 +30,9 @@ public class UserController {
     @PostMapping
     @Operation(summary = "Create new user",
             description = "Create a new user (requires USER_WRITE permission and ADMIN role)")
-    public Mono<UserDto> createUser(@RequestBody UserCreateRequest request) {
-        return userService.createUser(request);
+    public Mono<ApiResponse<UserDto>> createUser(@RequestBody UserCreateRequest request) {
+        return userService.createUser(request)
+                .map(userDto -> new ApiResponse<>("User is created successfully.", userDto));
     }
     
     @GetMapping
