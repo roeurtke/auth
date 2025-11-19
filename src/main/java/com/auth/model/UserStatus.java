@@ -6,8 +6,8 @@ package com.auth.model;
  */
 public enum UserStatus {
     ACTIVE(1, "Active"),
-    INACTIVE(2, "Inactive"),
-    DELETED(3, "Deleted");
+    INACTIVE(0, "Inactive"),
+    DELETED(2, "Deleted");
     
     private final int value;
     private final String displayName;
