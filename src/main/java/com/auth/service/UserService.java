@@ -143,25 +143,66 @@ public class UserService implements ReactiveUserDetailsService {
 
     @PreAuthorize("hasAuthority('USER_WRITE') and hasRole('ADMIN')")
     public Mono<UserDto> updateUser(Long id, UserDto userDto) {
-        return userRepository.findByIdAndIsDeletedFalse(id)
-                .flatMap(user -> {
+        return userRepository.findById(id)
+            .switchIfEmpty(Mono.error(new RuntimeException("User not found")))
+            .flatMap(user -> {
+
+                // Update normal fields
+                if (userDto.getFirstName() != null)
                     user.setFirstName(userDto.getFirstName());
+
+                if (userDto.getLastName() != null)
                     user.setLastName(userDto.getLastName());
+
+                if (userDto.getEmail() != null)
                     user.setEmail(userDto.getEmail());
+
+                if (userDto.getPhoneNumber() != null)
                     user.setPhoneNumber(userDto.getPhoneNumber());
-                    if (userDto.getStatus() != null) {
-                        try {
-                            user.setStatus(com.auth.model.UserStatus.valueOf(userDto.getStatus()).getValue());
-                        } catch (IllegalArgumentException e) {
-                            return Mono.error(new RuntimeException("Invalid status value: " + userDto.getStatus()));
-                        }
+
+                // Update status (enum name only)
+                if (userDto.getStatus() != null) {
+                    try {
+                        com.auth.model.UserStatus statusEnum =
+                                com.auth.model.UserStatus.valueOf(userDto.getStatus().toUpperCase());
+                        user.setStatus(statusEnum.getValue());
+                    } catch (IllegalArgumentException ex) {
+                        return Mono.error(new RuntimeException(
+                                "Invalid status: " + userDto.getStatus()
+                        ));
                     }
-                    if (userDto.getIsDeleted() != null) {
-                        user.setIsDeleted(userDto.getIsDeleted());
-                    }
-                    return userRepository.save(user);
-                })
-                .flatMap(this::mapUserToDto);
+                }
+
+                // Soft delete toggle
+                if (userDto.getIsDeleted() != null)
+                    user.setIsDeleted(userDto.getIsDeleted());
+
+                user.setUpdatedAt(LocalDateTime.now());
+
+                return userRepository.save(user);
+            })
+            .flatMap(savedUser -> {
+
+                // Update roles if provided
+                if (userDto.getRoles() == null || userDto.getRoles().isEmpty()) {
+                    return Mono.just(savedUser);
+                }
+
+                return userRoleRepository.deleteByUserId(savedUser.getId())
+                    .thenMany(Flux.fromIterable(userDto.getRoles())
+                        .flatMap(roleName -> roleRepository.findByName(roleName)
+                            .switchIfEmpty(Mono.error(new RuntimeException("Role not found: " + roleName)))
+                        )
+                        .flatMap(role -> 
+                            userRoleRepository.save(
+                                new com.auth.model.UserRole(savedUser.getId(), role.getId())
+                            )
+                        )
+                    )
+                    .then(Mono.just(savedUser));
+            })
+            .flatMap(user -> loadUserRoles(user).thenReturn(user))
+            .flatMap(this::mapUserToDto);
     }
     
     @PreAuthorize("hasAuthority('USER_DELETE') and hasRole('ADMIN')")
