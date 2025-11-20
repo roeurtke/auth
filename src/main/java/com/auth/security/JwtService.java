@@ -109,10 +109,8 @@ public class JwtService {
             }
             return true;
         } catch (ExpiredJwtException e) {
-            System.err.println("Token expired: " + e.getMessage());
-            throw e;
+            throw new RuntimeException("Access token has expired. Please refresh your token.", e);
         } catch (Exception e) {
-            System.err.println("Invalid token: " + e.getMessage());
             throw new RuntimeException("Invalid access token.", e);
         }
     }
