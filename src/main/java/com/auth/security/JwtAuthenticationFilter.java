@@ -26,8 +26,16 @@ public class JwtAuthenticationFilter implements ServerAuthenticationConverter {
     @Override
     public Mono<Authentication> convert(ServerWebExchange exchange) {
         return extractTokenFromRequest(exchange)
-                .filter(token -> jwtService.validateToken(token))
                 .flatMap(token -> {
+                    try {
+                        if (!jwtService.validateToken(token)) {
+                            return Mono.empty();
+                        }
+                    } catch (Exception e) {
+                        // Token validation failed, return empty to trigger 401
+                        return Mono.empty();
+                    }
+                    
                     String username = jwtService.extractUsername(token);
                     return userService.findByUsername(username)
                             .map(userDetails -> new UsernamePasswordAuthenticationToken(
@@ -35,7 +43,8 @@ public class JwtAuthenticationFilter implements ServerAuthenticationConverter {
                                     token, 
                                     userDetails.getAuthorities()
                             ));
-                });
+                })
+                .onErrorResume(e -> Mono.empty());
     }
     
     private Mono<String> extractTokenFromRequest(ServerWebExchange exchange) {

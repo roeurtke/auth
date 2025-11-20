@@ -19,6 +19,9 @@ import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import reactor.core.publisher.Mono;
 
 /**
@@ -61,6 +64,24 @@ public class SecurityConfig {
     ReactiveAuthenticationManager jwtAuthManager = authentication -> Mono.just(authentication);
     AuthenticationWebFilter authenticationWebFilter = new AuthenticationWebFilter(jwtAuthManager);
     authenticationWebFilter.setServerAuthenticationConverter(jwtAuthenticationFilter);
+    
+    // Add custom authentication failure handler to return proper error response
+    authenticationWebFilter.setAuthenticationFailureHandler((exchange, ex) -> {
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", LocalDateTime.now());
+        response.put("status", 401);
+        response.put("error", "Authentication Failed");
+        response.put("message", "Invalid or expired access token. Please provide a valid token.");
+        
+        exchange.getResponse().setStatusCode(org.springframework.http.HttpStatus.UNAUTHORIZED);
+        exchange.getResponse().getHeaders().setContentType(org.springframework.http.MediaType.APPLICATION_JSON);
+        
+        byte[] responseBytes = new com.fasterxml.jackson.databind.ObjectMapper()
+            .writeValueAsBytes(response);
+        return exchange.getResponse().writeWith(
+            Mono.just(exchange.getResponse().bufferFactory().wrap(responseBytes))
+        );
+    });
         
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)

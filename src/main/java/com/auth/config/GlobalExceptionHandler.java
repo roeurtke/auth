@@ -7,6 +7,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.support.WebExchangeBindException;
+import io.jsonwebtoken.ExpiredJwtException;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
@@ -68,10 +69,30 @@ public class GlobalExceptionHandler {
         return Mono.just(ResponseEntity.badRequest().body(response));
     }
     
+    @ExceptionHandler(ExpiredJwtException.class)
+    public Mono<ResponseEntity<Map<String, Object>>> handleExpiredJwtException(ExpiredJwtException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", LocalDateTime.now());
+        response.put("status", HttpStatus.UNAUTHORIZED.value());
+        response.put("error", "Token Expired");
+        response.put("message", "Your access token has expired. Please refresh your token.");
+        
+        return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response));
+    }
+    
     @ExceptionHandler(RuntimeException.class)
     public Mono<ResponseEntity<Map<String, Object>>> handleRuntimeException(RuntimeException ex) {
         Map<String, Object> response = new HashMap<>();
         response.put("timestamp", LocalDateTime.now());
+        
+        // Check if it's a token-related error
+        if (ex.getMessage() != null && (ex.getMessage().contains("token") || ex.getMessage().contains("Token"))) {
+            response.put("status", HttpStatus.UNAUTHORIZED.value());
+            response.put("error", "Token Error");
+            response.put("message", ex.getMessage());
+            return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response));
+        }
+        
         response.put("status", HttpStatus.BAD_REQUEST.value());
         response.put("error", "Bad Request");
         response.put("message", ex.getMessage());

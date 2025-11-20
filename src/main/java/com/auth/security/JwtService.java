@@ -1,6 +1,7 @@
 package com.auth.security;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -103,9 +104,16 @@ public class JwtService {
     
     public Boolean validateToken(String token) {
         try {
-            return !isTokenExpired(token);
+            if (isTokenExpired(token)) {
+                throw new ExpiredJwtException(null, null, "Token has expired");
+            }
+            return true;
+        } catch (ExpiredJwtException e) {
+            System.err.println("Token expired: " + e.getMessage());
+            throw e;
         } catch (Exception e) {
-            return false;
+            System.err.println("Invalid token: " + e.getMessage());
+            throw new RuntimeException("Invalid access token.", e);
         }
     }
 }
