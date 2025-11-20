@@ -4,6 +4,7 @@ import io.r2dbc.spi.ConnectionFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.r2dbc.connection.init.ConnectionFactoryInitializer;
 import org.springframework.r2dbc.connection.init.ResourceDatabasePopulator;
@@ -16,6 +17,7 @@ import org.springframework.r2dbc.connection.init.ResourceDatabasePopulator;
 public class DatabaseConfig {
 
     @Bean
+    @ConditionalOnProperty(prefix = "app.db", name = "init", havingValue = "true", matchIfMissing = false)
     public ConnectionFactoryInitializer databaseInitializer(ConnectionFactory connectionFactory) {
         ConnectionFactoryInitializer initializer = new ConnectionFactoryInitializer();
         initializer.setConnectionFactory(connectionFactory);
@@ -30,9 +32,10 @@ public class DatabaseConfig {
     }
 
     @Bean
+    @ConditionalOnProperty(prefix = "app.db", name = "init", havingValue = "true", matchIfMissing = false)
     public CommandLineRunner initCheck() {
         return args -> {
-            System.out.println("✅ Database initialization configured!");
+            System.out.println("✅ Database initialization completed!");
         };
     }
 }
