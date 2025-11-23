@@ -34,7 +34,7 @@ public class AuthService {
     }
     
     @Transactional
-    public Mono<AuthResponse> register(RegisterRequest request) {
+    public Mono<com.auth.dto.RegisterResponse> register(RegisterRequest request) {
         return userService.existsByUsername(request.getUsername())
                 .flatMap(exists -> {
                     if (exists) {
@@ -66,11 +66,9 @@ public class AuthService {
                             });
                 })
                 .flatMap(user -> {
-                    String accessToken = jwtService.generateAccessToken(user);
-                    String refreshToken = jwtService.generateRefreshToken(user);
-                    Long expiresIn = jwtService.extractExpiration(accessToken).getTime() - System.currentTimeMillis();
-                    
-                    return Mono.just(new AuthResponse(accessToken, refreshToken, expiresIn));
+                    // For registration we only return a success message (no tokens)
+                    com.auth.dto.RegisterResponse resp = new com.auth.dto.RegisterResponse("User registered successful.");
+                    return Mono.just(resp);
                 });
     }
     
@@ -82,8 +80,9 @@ public class AuthService {
                     String accessToken = jwtService.generateAccessToken(user);
                     String refreshToken = jwtService.generateRefreshToken(user);
                     Long expiresIn = jwtService.extractExpiration(accessToken).getTime() - System.currentTimeMillis();
-                    
-                    return Mono.just(new AuthResponse(accessToken, refreshToken, expiresIn));
+                    AuthResponse resp = new AuthResponse(accessToken, refreshToken, expiresIn);
+                    resp.setMessage("User has been authenticated successfully.");
+                    return Mono.just(resp);
                 });
     }
     

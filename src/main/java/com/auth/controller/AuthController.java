@@ -38,7 +38,7 @@ public class AuthController {
     @ApiResponse(responseCode = "201", description = "User registered successfully", 
         content = @Content(schema = @Schema(implementation = AuthResponse.class)))
     @ApiResponse(responseCode = "400", description = "Invalid input or user already exists")
-    public Mono<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
+    public Mono<com.auth.dto.RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
         return authService.register(request);
     }
     

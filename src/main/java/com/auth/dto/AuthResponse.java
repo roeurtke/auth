@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "Authentication response")
 public class AuthResponse {
     
-    @Schema(description = "Authentication message", example = "Success")
+    @Schema(description = "Authentication message", example = "User has been authenticated successfully.")
     private String message;
 
     @Schema(description = "Access token", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
@@ -30,7 +30,7 @@ public class AuthResponse {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.expiresIn = expiresIn;
-        // this.message = (accessToken != null && !accessToken.isBlank()) ? "Success" : null;
+        // default message for token responses
         this.message = "Success";
     }
 
