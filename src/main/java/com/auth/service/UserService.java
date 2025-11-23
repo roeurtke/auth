@@ -1,7 +1,7 @@
 package com.auth.service;
 
 import com.auth.dto.UserCreateRequest;
-import com.auth.dto.UserDto;
+import com.auth.dto.UserResponse;
 import com.auth.model.User;
 import com.auth.repository.UserRepository;
 import com.auth.repository.UserRoleRepository;
@@ -84,21 +84,21 @@ public class UserService implements ReactiveUserDetailsService {
     }
     
     @PreAuthorize("hasAuthority('USER_READ') or hasRole('ADMIN')")
-    public Flux<UserDto> findAllUsers() {
+    public Flux<UserResponse> findAllUsers() {
         return userRepository.findAllByIsDeletedFalse()
                 .flatMap(user -> loadUserRoles(user).thenReturn(user))
                 .flatMap(this::mapUserToDto);
     }
     
     @PreAuthorize("hasAuthority('USER_READ') or hasRole('ADMIN')")
-    public Mono<UserDto> findUserById(Long id) {
+    public Mono<UserResponse> findUserById(Long id) {
         return userRepository.findByIdAndIsDeletedFalse(id)
                 .flatMap(user -> loadUserRoles(user).thenReturn(user))
                 .flatMap(this::mapUserToDto);
     }
 
     @PreAuthorize("hasAuthority('USER_WRITE') or hasRole('ADMIN')")
-    public Mono<UserDto> createUser(UserCreateRequest request) {
+    public Mono<UserResponse> createUser(UserCreateRequest request) {
 
         return existsByUsername(request.getUsername())
                 .flatMap(exists -> {
@@ -148,28 +148,28 @@ public class UserService implements ReactiveUserDetailsService {
     }
 
     @PreAuthorize("hasAuthority('USER_WRITE') and hasRole('ADMIN')")
-    public Mono<UserDto> updateUser(Long id, UserDto userDto) {
+    public Mono<UserResponse> updateUser(Long id, UserResponse userResponse) {
         return userRepository.findById(id)
             .switchIfEmpty(Mono.error(new RuntimeException("User not found")))
             .flatMap(user -> {
 
                 // Update normal fields
-                if (userDto.getFirstName() != null)
-                    user.setFirstName(userDto.getFirstName());
+                if (userResponse.getFirstName() != null)
+                    user.setFirstName(userResponse.getFirstName());
 
-                if (userDto.getLastName() != null)
-                    user.setLastName(userDto.getLastName());
+                if (userResponse.getLastName() != null)
+                    user.setLastName(userResponse.getLastName());
 
-                if (userDto.getEmail() != null)
-                    user.setEmail(userDto.getEmail());
+                if (userResponse.getEmail() != null)
+                    user.setEmail(userResponse.getEmail());
 
-                if (userDto.getPhoneNumber() != null)
-                    user.setPhoneNumber(userDto.getPhoneNumber());
+                if (userResponse.getPhoneNumber() != null)
+                    user.setPhoneNumber(userResponse.getPhoneNumber());
 
                 // Update status (enum name only)
-                if (userDto.getStatus() != null) {
+                if (userResponse.getStatus() != null) {
                     try {
-                        EnumStatus statusEnum = EnumStatus.valueOf(userDto.getStatus().toUpperCase());
+                        EnumStatus statusEnum = EnumStatus.valueOf(userResponse.getStatus().toUpperCase());
                         user.setStatus(statusEnum.getValue());
                         // If status set to ACTIVE, ensure the user is not marked as deleted
                         if (statusEnum == EnumStatus.ACTIVE) {
@@ -177,14 +177,14 @@ public class UserService implements ReactiveUserDetailsService {
                         }
                     } catch (IllegalArgumentException ex) {
                         return Mono.error(new RuntimeException(
-                                "Invalid status: " + userDto.getStatus()
+                                "Invalid status: " + userResponse.getStatus()
                         ));
                     }
                 }
 
                 // Soft delete toggle
-                if (userDto.getIsDeleted() != null)
-                    user.setIsDeleted(userDto.getIsDeleted());
+                if (userResponse.getIsDeleted() != null)
+                    user.setIsDeleted(userResponse.getIsDeleted());
 
                 user.setUpdatedAt(LocalDateTime.now());
 
@@ -193,12 +193,12 @@ public class UserService implements ReactiveUserDetailsService {
             .flatMap(savedUser -> {
 
                 // Update roles if provided
-                if (userDto.getRoles() == null || userDto.getRoles().isEmpty()) {
+                if (userResponse.getRoles() == null || userResponse.getRoles().isEmpty()) {
                     return Mono.just(savedUser);
                 }
 
                 return userRoleRepository.deleteByUserId(savedUser.getId())
-                    .thenMany(Flux.fromIterable(userDto.getRoles())
+                    .thenMany(Flux.fromIterable(userResponse.getRoles())
                         .flatMap(roleName -> roleRepository.findByName(roleName)
                             .switchIfEmpty(Mono.error(new RuntimeException("Role not found: " + roleName)))
                         )
@@ -238,8 +238,8 @@ public class UserService implements ReactiveUserDetailsService {
         return userRepository.save(user);
     }
     
-    private Mono<UserDto> mapUserToDto(User user) {
-        UserDto dto = new UserDto();
+    private Mono<UserResponse> mapUserToDto(User user) {
+        UserResponse dto = new UserResponse();
         dto.setId(user.getId());
         dto.setFirstName(user.getFirstName());
         dto.setLastName(user.getLastName());

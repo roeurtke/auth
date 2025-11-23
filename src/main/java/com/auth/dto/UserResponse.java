@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  * DTO for user responses.
  */
 @Schema(description = "User data transfer object")
-public class UserDto {
+public class UserResponse {
     
     @Schema(description = "User ID", example = "1")
     private Long id;
@@ -48,7 +48,7 @@ public class UserDto {
     @Schema(description = "Last update timestamp")
     private LocalDateTime updatedAt;
 
-    public UserDto() {}
+    public UserResponse() {}
 
     // Getters and Setters
     public Long getId() { return id; }
