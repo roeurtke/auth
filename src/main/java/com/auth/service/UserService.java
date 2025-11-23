@@ -10,6 +10,7 @@ import com.auth.repository.RolePermissionRepository;
 import com.auth.repository.PermissionRepository;
 import com.auth.util.EnumStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -30,14 +31,17 @@ public class UserService implements ReactiveUserDetailsService {
     private final RoleRepository roleRepository;
     private final RolePermissionRepository rolePermissionRepository;
     private final PermissionRepository permissionRepository;
+    private final PasswordEncoder passwordEncoder;
     
     public UserService(UserRepository userRepository, UserRoleRepository userRoleRepository, RoleRepository roleRepository,
-                    RolePermissionRepository rolePermissionRepository, PermissionRepository permissionRepository) {
+                    RolePermissionRepository rolePermissionRepository, PermissionRepository permissionRepository,
+                    PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userRoleRepository = userRoleRepository;
         this.roleRepository = roleRepository;
         this.rolePermissionRepository = rolePermissionRepository;
         this.permissionRepository = permissionRepository;
+        this.passwordEncoder = passwordEncoder;
     }
     
         @Override
@@ -112,7 +116,8 @@ public class UserService implements ReactiveUserDetailsService {
                     user.setFirstName(request.getFirstName());
                     user.setLastName(request.getLastName());
                     user.setUsername(request.getUsername());
-                    user.setPassword(request.getPassword());
+                    // encode password before saving
+                    user.setPassword(passwordEncoder != null ? passwordEncoder.encode(request.getPassword()) : request.getPassword());
                     user.setEmail(request.getEmail());
                     user.setPhoneNumber(request.getPhoneNumber());
                     user.setStatus(EnumStatus.ACTIVE.getValue());
