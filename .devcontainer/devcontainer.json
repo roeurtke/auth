@@ -1,7 +1,7 @@
 {
   "name": "Auth DevContainer",
   "dockerComposeFile": ["../docker-compose.yml"],
-  "service": "auth",
+  "service": "auth-service",
   "workspaceFolder": "/workspace/auth",
   "customizations": {
     "vscode": {

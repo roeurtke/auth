@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  auth:
+  auth-service:
     build:
       context: .devcontainer
       dockerfile: Dockerfile
